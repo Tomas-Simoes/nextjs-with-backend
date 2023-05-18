@@ -1,0 +1,8 @@
+version: '3'
+services:
+  backend:
+    image: simoeswh/deploy-to-ecs-repo:backend
+    x-aws-pull_credentials: "arn:aws:secretsmanager:eu-west-1:910807620466:secret:myToken-JvnsLl"
+    build: ./back-end
+    ports:
+      - 8080:8080
