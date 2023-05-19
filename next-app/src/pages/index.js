@@ -2,7 +2,8 @@ import styles from '../styles/Home.module.css';
 export default function Home() {
     const callAPI = async () => {
         try {
-            const res = await fetch(`http://nextj-loadb-3dm493kpmfuj-1da968a529193f97.elb.eu-west-1.amazonaws.com/`);
+            console.log("Requesting API over: 'https://nextj-loadb-3dm493kpmfuj-1da968a529193f97.elb.eu-west-1.amazonaws.com/'")
+            const res = await fetch(`https://nextj-loadb-3dm493kpmfuj-1da968a529193f97.elb.eu-west-1.amazonaws.com/`);
             const data = await res.json();
             console.log(data);
         } catch (err) {
