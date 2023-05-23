@@ -5,8 +5,10 @@ export default function Home() {
       console.log(
         "Requesting API over: 'https://backendtest.famousgadget.pt/'"
       );
+
       const res = await fetch(`https://backendtest.famousgadget.pt/`);
       const data = await res.json();
+
       console.log(data);
     } catch (err) {
       console.log(err);
