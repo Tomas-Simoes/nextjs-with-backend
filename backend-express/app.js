@@ -1,9 +1,18 @@
 const express = require("express");
 const cors = require("cors");
+const redis = require("redis");
 const mongoose = require("mongoose");
+const debug = require("redis/lib/debug");
 const app = express();
+
+const PORT = 8080;
+const REDIS_PORT = 6379;
+
+const client = redis.createClient({ url: "redis://redis:6379" });
+client.on("error", (err) => console.log("Redis server error:  " + err));
+
 const mongoURI =
-  "mongodb+srv://simoes:simoes12345@cluster0.qksi9tv.mongodb.net/noteApp?retryWrites=true&w=majority";
+  "mongodb+srv://simoes:simoes12345@cluster0.qksi9tv.mongodb.net/noteTestDatabase?retryWrites=true&w=majority";
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -50,8 +59,12 @@ app.get("/add", async (req, res) => {
     important: true,
   });
 
+  client.set(noteCount + 1, "This is note number " + noteCount + 1);
+
   newNote.save().then((result) => {
-    return res.json({ response: "Note saved successfully!" });
+    return res.json({
+      response: "Note " + (noteCount + 1) + " saved successfully!",
+    });
   });
 });
 
@@ -61,6 +74,24 @@ app.get("/dbcount", async (req, res) => {
   Note.find({}).then((result) => {
     return res.json({ count: result.length });
   });
+});
+
+app.get("/redis/:noteNumber", (req, res) => {
+  try {
+    const noteNumber = req.params.noteNumber;
+
+    console.log("Trying to get from cache note " + noteNumber);
+
+    client.get(noteNumber, async (err, cache_data) => {
+      if (cache_data) {
+        return res.json({
+          message: `Retrieved note number ${cache_data} from the cache`,
+        });
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 /*
@@ -75,6 +106,6 @@ app.post("/products", async (req, res) => {
 });
 */
 
-app.listen(8080, () => {
+app.listen(PORT, () => {
   console.log("Servidor iniciado na porta 8080: http://localhost:8080");
 });

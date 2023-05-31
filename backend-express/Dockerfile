@@ -1,5 +1,5 @@
 # Get a light weight Linux distribution with node version 16 installed on it
-FROM node:16-alpine 
+FROM node:16.17.0-bullseye-slim
 
 # Initialize a working directory in your new OS.
 WORKDIR /usr/src/app
