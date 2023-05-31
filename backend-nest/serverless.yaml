@@ -1,0 +1,30 @@
+# App name
+service: lambda-deploy-test
+
+# Enables .env file to be used
+useDotenv: true
+
+plugins:
+  - serverless-offline
+  - serverless-plugin-common-excludes
+  - serverless-plugin-include-dependencies
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: dev
+  region: eu-west-1
+  environment: #define env variables
+
+functions:
+  main:
+    name: ${sls:stage}-gateway
+    description: This is the test gateway for the Lambda deployment
+    handler: dist/serverless.handler
+    events:
+      - http:
+          method: ANY
+          path: /
+      - http:
+          method: ANY
+          path: '{proxy+}'
