@@ -65,7 +65,7 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <main className={styles.main}>
-        <div>Made change in main repository.</div>
+        <div>Second change made in main repository.</div>
         
         <button onClick={callAPI}>Make API call</button>
         <button onClick={addToDatabase}>Add item to database</button>
