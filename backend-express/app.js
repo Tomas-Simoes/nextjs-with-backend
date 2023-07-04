@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const debug = require("redis/lib/debug");
 const app = express();
 
-const PORT = 8080;
+const PORT = 3000;
 const REDIS_PORT = 6379;
 
 const client = redis.createClient({ url: "redis://redis:6379" });
@@ -45,8 +45,8 @@ const noteSchema = new mongoose.Schema({
 const Note = mongoose.model("Note", noteSchema);
 
 //? ROUTES
-app.get("/", async (req, res) => {
-  return res.json({ response: "This is the response from backend" });
+app.get("/prod/Health", async (req, res) => {
+  return res.json({ response: "Express server is healthy." });
 });
 
 app.get("/add", async (req, res) => {

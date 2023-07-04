@@ -3,10 +3,10 @@ export default function Home() {
   const callAPI = async () => {
     try {
       console.log(
-        "Requesting API over: 'https://backendtest.famousgadget.pt/'"
+        "Requesting API over: '" + process.env.NEXT_PUBLIC_API_URL + "/Health'"
       );
 
-      const res = await fetch(`https://backendtest.famousgadget.pt/`);
+      const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/Health`);
 
       /*
       console.log("Requesting API over: 'http://localhost:8080'");

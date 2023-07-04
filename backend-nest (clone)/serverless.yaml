@@ -1,5 +1,5 @@
 # App name
-service: backend-lambda
+service: backend-lambda-clone-01
 
 #? Serverless Dotenv Plugin replaces this
 # Enables .env file to be used
@@ -27,15 +27,22 @@ package:
     - node-modules/**
 
 functions:
-  backend:
-    name: backend
+  backend-clone:
+    name: backend-clone
     description: Demo backend for the Lambda deployment
     handler: dist/serverless.handler
     include:
       - 'dist/**/*'
     events:
-      - http: ANY /{proxy+}
-      - http: ANY /
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors:
+            origins:
+              - 'http://localhost:8000' # Replace with the allowed origin(s) for your frontend
+            headers:
+              - Content-Type
+            allowCredentials: false
 
       #- http:
       #    method: ANY
