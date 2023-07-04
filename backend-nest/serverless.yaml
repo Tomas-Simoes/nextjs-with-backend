@@ -12,19 +12,26 @@ plugins:
 provider:
   name: aws
   runtime: nodejs14.x
-  stage: dev
+  stage: prod
   region: eu-west-1
   environment: #define env variables
 
 functions:
   main:
     name: ${sls:stage}-gateway
-    description: This is the test gateway for the Lambda deployment
+    description: Demo gateway for the Lambda deployment
     handler: dist/serverless.handler
     events:
       - http:
           method: ANY
           path: /
-      - http:
-          method: ANY
-          path: '{proxy+}'
+
+      #- http:
+      #    method: ANY
+      #    path: /health # Catch /health route
+      #- http:
+      #    method: ANY
+      #    path: /todos # Catch /todos route
+      #- http:
+      #    method: ANY
+      #    path: /todos/{any+} # Catch all todos routes

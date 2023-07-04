@@ -1,1 +1,63 @@
-asd
+import { NestFactory } from '@nestjs/platform-serverless';
+import { AppModule } from './app.module';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import { ValidationPipe } from '@nestjs/common';
+import * as Sentry from '@sentry/node';
+import helmet from 'helmet';
+import { TimeoutInterceptor } from '@gateway/shared/interceptors/timeout.interceptor';
+import { AuthExceptionFilter } from '@gateway/shared/exceptions/auth.exception';
+import { ContextLogger } from '@gateway/shared/context-logger/context-logger.service';
+import { registerSwagger } from '@gateway/shared/config/swagger-config';
+import { SentryInterceptor } from '@gateway/shared/interceptors/sentry.interceptor';
+import { corsOptions } from '@gateway/shared/config/cors-config';
+import { registerFastifyMiddlewares } from '@gateway/shared/config/fastify-middlewares';
+import { configureSentry } from '@top/microservices';
+
+const isProduction = process.env.NODE_ENV !== 'development';
+const APP_PORT = process.env.PORT ? parseInt(process.env.PORT) : 2002;
+
+export const createHandler = async () => {
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter({ logger: false, trustProxy: true }),
+  );
+
+  // It's a good practice to avoid having long time requests
+  // Heroku after 30 seconds takes the request down
+  app.useGlobalInterceptors(new TimeoutInterceptor());
+
+  if (isProduction) {
+    configureSentry(Sentry, 'gateway', process.env);
+    app.useGlobalInterceptors(new SentryInterceptor());
+  }
+
+  app.enableShutdownHooks();
+  app.use(helmet({ contentSecurityPolicy: false }));
+  app.setGlobalPrefix('/dev');
+  app.useLogger(new ContextLogger());
+  app.enableCors(corsOptions);
+  app.useGlobalFilters(new AuthExceptionFilter());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      forbidUnknownValues: false,
+      forbidNonWhitelisted: true,
+      skipMissingProperties: false,
+    }),
+  );
+
+  await registerFastifyMiddlewares(app);
+
+  if (process.env.NODE_ENV !== 'production') {
+    registerSwagger(app);
+  }
+
+  await app.init();
+
+  return app.getHttpAdapter().getInstance();
+};
+
+export const handler = async (event: any, context: any) => {
+  const app = await createHandler();
+  return app(event, context);
+};

@@ -19,6 +19,8 @@ export const handler: Handler = async (
   context: Context,
   callback: Callback,
 ) => {
+  context.callbackWaitsForEmptyEventLoop = false;
+
   server = server ?? (await bootstrap());
   return server(event, context, callback);
 };
